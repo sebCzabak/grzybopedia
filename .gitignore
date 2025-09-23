@@ -1,0 +1,19 @@
+# Pliki systemowe
+.DS_Store
+Thumbs.db
+
+# Zależności Node (Frontend)
+grzybopedia-app/node_modules/
+grzybopedia-app/dist/
+grzybopedia-app/.env*
+grzybopedia-app/npm-debug.log*
+grzybopedia-app/yarn-error.log*
+
+# Środowisko wirtualne Python (Backend)
+grzybopedia-back/venv/
+grzybopedia-back/__pycache__/
+grzybopedia-back/*.pyc
+
+# Pliki IDE
+.vscode/
+.idea/
