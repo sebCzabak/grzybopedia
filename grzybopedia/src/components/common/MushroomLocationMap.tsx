@@ -16,7 +16,7 @@ interface MapProps {
 export const MushroomLocationMap = ({ center }: MapProps) => {
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
-    googleMapsApiKey: "AIzaSyDRFNr6YssRjYu_24slqS9gvj6dfwx2Bbw" 
+    googleMapsApiKey: "" 
   });
 
   if (!isLoaded) return <div>Ładowanie mapy...</div>;
