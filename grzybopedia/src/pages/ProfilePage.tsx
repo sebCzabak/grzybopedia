@@ -1,9 +1,18 @@
-import { Avatar, Box, Divider, Grid, Icon, List, ListItem, ListItemAvatar, ListItemText, Paper, Typography } from "@mui/material";
-import { type UserProfile } from "../types";
-import { mockUserProfile } from "../features/profile/mockData";
+import { Avatar, Box, Divider, Grid, Icon, List, ListItem, ListItemAvatar, ListItemText, Paper, Typography, CircularProgress, Alert } from "@mui/material";
+import { useAuth } from "../contexts/AuthContext"; 
 
 export const ProfilePage = () => {
-  const user: UserProfile = mockUserProfile;
+
+  const { user, isLoading } = useAuth();
+
+
+  if (isLoading) {
+    return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 10 }}><CircularProgress /></Box>;
+  }
+
+  if (!user) {
+    return <Alert severity="warning" sx={{ mt: 4 }}>Nie udało się załadować danych profilu. Spróbuj się zalogować ponownie.</Alert>;
+  }
 
   return (
     <Box>
@@ -12,16 +21,20 @@ export const ProfilePage = () => {
       </Typography>
 
       <Grid container spacing={4}>
-        {/* Kolumna z informacjami o użytkowniku */}
-        <Grid size={{xs:12, md:4}}>
+
+        <Grid size={{xs:12,md:4}}>
           <Paper elevation={3} sx={{ p: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%' }}>
             <Avatar
+
               alt={user.username}
               src={user.avatarUrl}
               sx={{ width: 120, height: 120, mb: 2, border: '4px solid', borderColor: 'primary.main' }}
             />
             <Typography variant="h5" component="h2" fontWeight="bold">
               {user.username}
+            </Typography>
+            <Typography color="text.secondary">
+              Email: {user.email} 
             </Typography>
             <Typography color="text.secondary">
               W społeczności od {new Date(user.memberSince).toLocaleDateString()}
@@ -46,25 +59,31 @@ export const ProfilePage = () => {
             <Typography variant="h5" component="h2" fontWeight="bold" gutterBottom>
               Zdobyte Odznaki
             </Typography>
-            <List>
-              {user.badges.map((badge, index) => (
-                <Box key={badge.id}>
-                  <ListItem>
-                    <ListItemAvatar>
-                      <Avatar sx={{ bgcolor: 'surface.main' }}>
-                        <Icon sx={{ color: 'secondary.main' }}>{badge.icon}</Icon>
-                      </Avatar>
-                    </ListItemAvatar>
-                    <ListItemText
-                      primary={badge.name}
-                      secondary={badge.description}
-                      primaryTypographyProps={{ fontWeight: 'bold' }}
-                    />
-                  </ListItem>
-                  {index < user.badges.length - 1 && <Divider variant="inset" component="li" />}
-                </Box>
-              ))}
-            </List>
+            {user.badges && user.badges.length > 0 ? (
+              <List>
+                {user.badges.map((badge, index) => (
+                  <Box key={badge.id}>
+                    <ListItem>
+                      <ListItemAvatar>
+                        <Avatar sx={{ bgcolor: 'surface.main' }}>
+                          <Icon sx={{ color: 'secondary.main' }}>{badge.icon}</Icon>
+                        </Avatar>
+                      </ListItemAvatar>
+                      <ListItemText
+                        primary={badge.name}
+                        secondary={badge.description}
+                        primaryTypographyProps={{ fontWeight: 'bold' }}
+                      />
+                    </ListItem>
+                    {index < user.badges.length - 1 && <Divider variant="inset" component="li" />}
+                  </Box>
+                ))}
+              </List>
+            ) : (
+              <Typography color="text.secondary" sx={{ mt: 2 }}>
+                Nie zdobyłeś jeszcze żadnych odznak. Czas ruszyć do lasu! 🌲
+              </Typography>
+            )}
           </Paper>
         </Grid>
       </Grid>

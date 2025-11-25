@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link as RouterLink, useParams } from "react-router-dom";
-import { Box, Typography, Container, Grid, Chip, Alert, CircularProgress, Button } from "@mui/material";
+import { Box, Typography, Container, Grid, Alert, CircularProgress, Button, Chip } from "@mui/material";
 import { getMushroomById } from "../features/atlas/atlasApi";
 import { MushroomLocationMap } from "../components/common/MushroomLocationMap";
 import { type Mushroom } from "../types";

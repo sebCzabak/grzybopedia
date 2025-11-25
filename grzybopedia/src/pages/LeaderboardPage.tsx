@@ -1,3 +1,4 @@
+import  { useEffect, useState } from 'react';
 import {
   Avatar,
   Box,
@@ -8,14 +9,49 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Typography, 
+  Typography,
+  CircularProgress, 
+  Alert 
 } from "@mui/material";
 import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
-import { mockLeaderboard } from "../features/leaderboard/mockData";
 import { type LeaderboardUser } from "../types";
+import { getLeaderboard } from '../features/leaderboard/leaderboardApi';
+import { mockLeaderboard } from '../features/leaderboard/mockData';
 
 export const LeaderboardPage = () => {
-  const users: LeaderboardUser[] = mockLeaderboard;
+  // const [users, setUsers] = useState<LeaderboardUser[]>([]);
+  // const [isLoading, setIsLoading] = useState(true);
+  // const [error, setError] = useState<string | null>(null);
+
+  // useEffect(() => {
+  //   const fetchLeaderboard = async () => {
+  //     try {
+  //       const data = await getLeaderboard();
+  //       setUsers(data);
+  //     } catch (err: any) {
+  //       console.error("Błąd podczas pobierania rankingu:", err);
+  //       setError("Nie udało się załadować tabeli wyników. Spróbuj ponownie później.");
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   };
+
+  //   fetchLeaderboard();
+  // }, []); 
+
+
+  // if (isLoading) {
+  //   return (
+  //     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 10 }}>
+  //       <CircularProgress />
+  //     </Box>
+  //   );
+  // }
+
+  // if (error) {
+  //   return <Alert severity="error" sx={{ mt: 4 }}>{error}</Alert>;
+  // }
+  const users:LeaderboardUser[]=mockLeaderboard;
 
   return (
     <Box>
@@ -38,10 +74,7 @@ export const LeaderboardPage = () => {
               <TableRow
                 key={user.rank}
                 sx={{ 
-                  '&:hover': { 
-                    backgroundColor: 'action.hover',
-                    cursor: 'pointer'
-                  },
+                  '&:hover': { backgroundColor: 'action.hover', cursor: 'pointer' },
                   '&:last-child td, &:last-child th': { border: 0 } 
                 }}
               >

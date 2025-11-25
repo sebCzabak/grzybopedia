@@ -2,7 +2,7 @@ import  { useState, type ChangeEvent, useRef, useCallback } from 'react';
 import {
   Box, Button, Paper, Typography, Alert, Card, CardMedia, CardContent,
   LinearProgress, Dialog, DialogTitle, DialogContent, DialogActions, Container,
-  Snackbar, keyframes
+  keyframes
 } from '@mui/material';
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
@@ -10,8 +10,10 @@ import ReplayIcon from '@mui/icons-material/Replay';
 import Webcam from 'react-webcam';
 import { type Mushroom } from '../../../types/index'
 import axiosInstance from '../../../api/axiosInstance';
+import { toast } from 'react-toastify';
+import { useAuth } from '../../../contexts/AuthContext'
 
-// Definicja animacji "wejścia" dla karty wyniku
+
 const fadeIn = keyframes`
   from {
     opacity: 0;
@@ -38,7 +40,8 @@ export const ImageUploader = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isWebcamOpen, setIsWebcamOpen] = useState(false);
   const webcamRef = useRef<Webcam>(null);
-  const [snackbar, setSnackbar] = useState<{ open: boolean, message: string, severity: 'success' | 'error' }>({ open: false, message: '', severity: 'success' });
+  const [isFindingSaved,setIsFindingSaved]=useState(false);
+  const { refetchUser } = useAuth();
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -47,6 +50,7 @@ export const ImageUploader = () => {
       setResult(null);
       setError(null);
       setUploadProgress(0);
+      setIsFindingSaved(false);
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreview(reader.result as string);
@@ -83,7 +87,7 @@ export const ImageUploader = () => {
     formData.append('image', selectedFile);
 
     try {
-      const response = await axiosInstance.post('/recognize', formData, {
+      const response = await axiosInstance.post('/usermushroom/recognize', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
         onUploadProgress: (progressEvent) => {
           const total = progressEvent.total ?? selectedFile.size;
@@ -93,11 +97,11 @@ export const ImageUploader = () => {
       });
 
       setResult(response.data);
-      setSnackbar({ open: true, message: 'Grzyb rozpoznany pomyślnie!', severity: 'success' });
+     toast.success('Grzyb rozpoznany pomyślnie!');
     } catch (err: any) {
       const errorMessage = err.response?.data?.error || "Nie udało się rozpoznać grzyba. Spróbuj z innym zdjęciem.";
       setError(errorMessage);
-      setSnackbar({ open: true, message: errorMessage, severity: 'error' });
+      toast.error(errorMessage);
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -110,7 +114,26 @@ export const ImageUploader = () => {
     setResult(null);
     setError(null);
     setUploadProgress(0);
+    setIsFindingSaved(false);
   };
+
+  const handleSaveFinding =async()=>{
+    if(!result)return;
+    try{
+      const response = await axiosInstance.post('/findings',{
+        mushroomId:result.id
+      });
+
+      toast.success('Znalezisko zapisane! Dodano punkty.');
+      setIsFindingSaved(true);
+      
+    }
+    catch(err:any){
+      console.error('Błąd podczas zapisywania znaleziska:',err);
+    toast.error(err);
+      
+    }
+  }
   
   return (
     <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
@@ -175,7 +198,7 @@ export const ImageUploader = () => {
           )}
         </Box>
 
-        {error && !snackbar.open && <Alert severity="error" sx={{ mt: 4 }}>{error}</Alert>}
+        {error &&  <Alert severity="error" sx={{ mt: 4 }}>{error}</Alert>}
         
         {result && (
           <Box sx={{ animation: `${fadeIn} 0.5s ease-out` }}>
@@ -196,14 +219,21 @@ export const ImageUploader = () => {
                 <Typography variant="body1" sx={{ mt: 2 }}>
                   {result.description}
                 </Typography>
-                <Typography variant="h6" sx={{ mt: 2, color: result.isEdible ? 'primary.main' : 'error.main' }}>
-                  {result.isEdible ? 'Jadalny' : 'Niejadalny / Trujący'}
-                </Typography>
               </CardContent>
             </Card>
-            <Button variant="outlined" onClick={handleClear} startIcon={<ReplayIcon />} sx={{ mt: 2 }}>
-              Rozpoznaj kolejnego
-            </Button>
+            <Box sx={{ mt: 2, display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
+      <Button 
+        variant="contained" 
+        color="primary" 
+        onClick={handleSaveFinding}
+        disabled={isFindingSaved} 
+      >
+        {isFindingSaved ? "Zapisano!" : "✅ Zapisz w moich znaleziskach"}
+      </Button>
+      <Button variant="outlined" onClick={handleClear} startIcon={<ReplayIcon />}>
+        Rozpoznaj kolejnego
+      </Button>
+    </Box>
           </Box>
         )}
       </Paper>
@@ -230,17 +260,6 @@ export const ImageUploader = () => {
           <Button onClick={capturePhoto} variant="contained">Zrób zdjęcie</Button>
         </DialogActions>
       </Dialog>
-
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert onClose={() => setSnackbar({ ...snackbar, open: false })} severity={snackbar.severity} sx={{ width: '100%' }}>
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
     </Container>
   );
 };

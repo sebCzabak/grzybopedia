@@ -7,13 +7,27 @@ import { AtlasPage } from './pages/AtlasPage';
 import { MushroomDetailPage } from './pages/MushroomDetailPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { LeaderboardPage } from './pages/LeaderboardPage';
+import { LoginPage } from './pages/LoginPage';
+import { AuthProvider } from './contexts/AuthContext';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+      <AuthProvider>
       <BrowserRouter>
         <Navbar />
+        <ToastContainer
+            position="top-right" 
+            autoClose={5000}     
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            pauseOnHover
+            theme="light" 
+          />
         <Container component="main" maxWidth="xl" sx={{ mt: 2 }}>
           <Routes>
             <Route path="/" element={<HomePage />} />
@@ -21,9 +35,11 @@ function App() {
             <Route path="/atlas/:id" element={<MushroomDetailPage />} />
             <Route path="/leaderboard" element={<LeaderboardPage />} />
             <Route path="/profil" element={<ProfilePage />} />
+            <Route path="/login" element={<LoginPage />} />
           </Routes>
         </Container>
       </BrowserRouter>
+      </AuthProvider>
     </ThemeProvider>
   );
 }

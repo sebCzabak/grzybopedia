@@ -13,21 +13,27 @@ import {
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import ForestIcon from '@mui/icons-material/Forest';
+import LogoutIcon from '@mui/icons-material/Logout';
+import Avatar from '@mui/material/Avatar'
+import LoginIcon from '@mui/icons-material/Login';
+import { useAuth } from '../../contexts/AuthContext';
 
 const pages = [
   { label: 'Rozpoznaj', path: '/' },
   { label: 'Atlas Grzybów', path: '/atlas' },
-  { label: 'Mój Profil', path: '/profil' },
-   { label: 'Tabela Wyników', path: '/leaderboard' },
+  { label: 'Tabela Wyników', path: '/leaderboard' },
+  { label: 'Mój Profil', path: '/profil', protected: true },
 ];
 
 export const Navbar = () => {
+  const { isAuthenticated, user, logout } = useAuth();
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
-  const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElNav(event.currentTarget);
-  };
-  const handleCloseNavMenu = () => {
-    setAnchorElNav(null);
+  const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => { setAnchorElNav(event.currentTarget); };
+  const handleCloseNavMenu = () => { setAnchorElNav(null); };
+
+  const handleLogoutAndClose = () => {
+    logout();
+    handleCloseNavMenu();
   };
 
   return (
@@ -76,12 +82,22 @@ export const Navbar = () => {
               sx={{ display: { xs: 'block', md: 'none' } }}
             >
               {pages.map((page) => (
-                <MenuItem key={page.label} onClick={handleCloseNavMenu} component={NavLink} to={page.path}>
-                  <Typography textAlign="center">{page.label}</Typography>
-                </MenuItem>
+                 (page.protected && !isAuthenticated) ? null : (
+                    <MenuItem key={page.label} onClick={handleCloseNavMenu} component={NavLink} to={page.path}>
+                      <Typography textAlign="center">{page.label}</Typography>
+                    </MenuItem>
+                 )
               ))}
+              <MenuItem onClick={handleCloseNavMenu}>
+                {isAuthenticated ? (
+                  <Button onClick={handleLogoutAndClose} color="inherit" startIcon={<LogoutIcon />} fullWidth>Wyloguj</Button>
+                ) : (
+                  <Button component={NavLink} to="/login" color="inherit" startIcon={<LoginIcon />} fullWidth>Zaloguj</Button>
+                )}
+              </MenuItem>
             </Menu>
           </Box>
+
           
           {/* Logo w widoku mobilnym */}
           <ForestIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1, fontSize: '2rem' }} />
@@ -104,15 +120,13 @@ export const Navbar = () => {
             Grzybopedia
           </Typography>
 
-          {/* Linki dla widoku desktop */}
-          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, justifyContent: 'flex-end' }}>
+        {/* Linki dla widoku desktop + Logowanie/Wylogowanie */}
+          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, justifyContent: 'flex-end', alignItems: 'center' }}>
             {pages.map((page) => (
-              <Button
-                key={page.label}
-                component={NavLink}
-                to={page.path}
-                onClick={handleCloseNavMenu}
-                sx={{ 
+              (page.protected && !isAuthenticated) ? null : (
+                <Button
+                  key={page.label} component={NavLink} to={page.path}
+                    sx={{ 
                   my: 2, 
                   color: 'text.primary', 
                   display: 'block',
@@ -122,13 +136,28 @@ export const Navbar = () => {
                     color: 'primary.contrastText'
                   }
                 }}
-              >
-                {page.label}
-              </Button>
+                >
+                  {page.label}
+                </Button>
+              )
             ))}
+            {/* Przyciski Logowania/Wylogowania + Avatar */}
+            {isAuthenticated ? (
+              <>
+                {user?.avatarUrl && <Avatar src={user.avatarUrl} sx={{ width: 32, height: 32, ml: 2 }} />}
+                <Button color="inherit" onClick={logout} startIcon={<LogoutIcon />} sx={{ ml: 1 }}>
+                  Wyloguj
+                </Button>
+              </>
+            ) : (
+              <Button component={NavLink} to="/login" color="inherit" startIcon={<LoginIcon />} sx={{ ml: 2 }}>
+                Zaloguj
+              </Button>
+            )}
           </Box>
         </Toolbar>
       </Container>
     </AppBar>
   );
 };
+

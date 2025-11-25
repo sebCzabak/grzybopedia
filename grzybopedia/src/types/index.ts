@@ -14,13 +14,14 @@ export interface Badge {
   description: string;
 }
 
-export interface UserProfile{
-  id:string;
-  username:string;
-  avatarUrl:string;
-  memberSince:string;
-  mushroomsFound:number;
-  badges:Badge[];
+export interface UserProfile {
+  id: string;
+  username: string;
+  email: string;      
+  avatarUrl?: string; 
+  memberSince: string; 
+  mushroomsFound: number; 
+  badges: Badge[];      
 }
 
 export interface LeaderboardUser{
