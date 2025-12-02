@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from flasgger import Swagger  # <-- Swagger import
+from flasgger import Swagger 
 import io
 
 # Importujemy funkcję z Twojego skryptu z modelem
