@@ -9,14 +9,17 @@ import { ProfilePage } from './pages/ProfilePage';
 import { LeaderboardPage } from './pages/LeaderboardPage';
 import { LoginPage } from './pages/LoginPage';
 import { AuthProvider } from './contexts/AuthContext';
+import { ProtectedRoute } from './components/common/ProtectedRoute';
+import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <AuthProvider>
+    <ErrorBoundary>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <AuthProvider>
       <BrowserRouter>
         <Navbar />
         <ToastContainer
@@ -34,13 +37,21 @@ function App() {
             <Route path="/atlas" element={<AtlasPage />} />
             <Route path="/atlas/:id" element={<MushroomDetailPage />} />
             <Route path="/leaderboard" element={<LeaderboardPage />} />
-            <Route path="/profil" element={<ProfilePage />} />
+            <Route 
+              path="/profil" 
+              element={
+                <ProtectedRoute>
+                  <ProfilePage />
+                </ProtectedRoute>
+              } 
+            />
             <Route path="/login" element={<LoginPage />} />
           </Routes>
         </Container>
       </BrowserRouter>
       </AuthProvider>
     </ThemeProvider>
+    </ErrorBoundary>
   );
 }
 

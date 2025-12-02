@@ -17,6 +17,7 @@ export const MushroomDetailPage = () => {
 
     const fetchMushroom = async () => {
       setIsLoading(true);
+      setError(null);
       try {
         const data = await getMushroomById(id);
         if (data) {
@@ -24,8 +25,10 @@ export const MushroomDetailPage = () => {
         } else {
           setError("Nie znaleziono grzyba o podanym ID.");
         }
-      } catch (err) {
-        setError("Wystąpił błąd podczas pobierania danych.");
+      } catch (err: any) {
+        const errorMessage = err.response?.data?.message || err.response?.data?.error || "Wystąpił błąd podczas pobierania danych.";
+        setError(errorMessage);
+        console.error('Błąd podczas pobierania grzyba:', err);
       } finally {
         setIsLoading(false);
       }

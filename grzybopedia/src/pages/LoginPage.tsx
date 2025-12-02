@@ -4,6 +4,7 @@ import { Box, Button, Container, Paper, TextField, Typography, Divider, Alert, L
 import GoogleIcon from '@mui/icons-material/Google';
 import axiosInstance from '../api/axiosInstance'; 
 import { useAuth } from '../contexts/AuthContext';
+import { toast } from 'react-toastify';
 
 export const LoginPage = () => {
   const [isRegistering, setIsRegistering] = useState(false);
@@ -28,7 +29,7 @@ export const LoginPage = () => {
         // --- REJESTRACJA ---
         await axiosInstance.post('/auth/register', { username, email, password });
         setIsRegistering(false);
-        ("Rejestracja zakończona pomyślnie! Możesz się teraz zalogować.");
+        toast.success("Rejestracja zakończona pomyślnie! Możesz się teraz zalogować.");
       } else {
         // --- LOGOWANIE ---
         const response = await axiosInstance.post('/auth/login', { email, password });
@@ -106,13 +107,11 @@ export const LoginPage = () => {
             {isRegistering ? "Zarejestruj się z Google" : "Zaloguj się z Google"}
           </Button> */}
 
-          <Grid container justifyContent="flex-end" sx={{ mt: 2 }}>
-            <Grid size={{}}>
-              <Link component="button" variant="body2" onClick={() => { setIsRegistering(!isRegistering); setError(null); }}>
-                {isRegistering ? "Masz już konto? Zaloguj się" : "Nie masz konta? Zarejestruj się"}
-              </Link>
-            </Grid>
-          </Grid>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+            <Link component="button" variant="body2" onClick={() => { setIsRegistering(!isRegistering); setError(null); }}>
+              {isRegistering ? "Masz już konto? Zaloguj się" : "Nie masz konta? Zarejestruj się"}
+            </Link>
+          </Box>
         </Box>
       </Paper>
     </Container>

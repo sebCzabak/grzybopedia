@@ -20,8 +20,22 @@ export const MushroomGrid = ({searchQuery}:MushroomGridProps) => {
         const data = await getMushrooms();
         setMushrooms(data);
         setError(null);
-      } catch (err) {
-        setError("Nie udało się załadować danych.");
+      } catch (err: any) {
+        console.error('Błąd podczas pobierania grzybów:', err);
+        
+        let errorMessage = "Nie udało się załadować danych.";
+        
+        if (err.response?.status === 404) {
+          errorMessage = "Endpoint /api/mushrooms nie został znaleziony. Upewnij się, że backend jest uruchomiony i endpoint istnieje.";
+        } else if (err.code === 'ERR_NETWORK' || err.message?.includes('Network Error')) {
+          errorMessage = "Nie można połączyć się z serwerem. Sprawdź czy backend jest uruchomiony na porcie 7079.";
+        } else if (err.response?.data?.message) {
+          errorMessage = err.response.data.message;
+        } else if (err.response?.data?.error) {
+          errorMessage = err.response.data.error;
+        }
+        
+        setError(errorMessage);
       } finally {
         setIsLoading(false);
       }
@@ -38,7 +52,19 @@ export const MushroomGrid = ({searchQuery}:MushroomGridProps) => {
   }, [mushrooms, searchQuery]);
 
   if (error) {
-    return <Alert severity="error">{error}</Alert>;
+    return (
+      <Alert severity="error" sx={{ mt: 2 }}>
+        <Typography variant="body1" fontWeight="bold" gutterBottom>
+          Błąd podczas ładowania atlasu
+        </Typography>
+        <Typography variant="body2">
+          {error}
+        </Typography>
+        <Typography variant="caption" display="block" sx={{ mt: 1, opacity: 0.8 }}>
+          Sprawdź konsolę przeglądarki (F12) aby zobaczyć szczegóły błędu.
+        </Typography>
+      </Alert>
+    );
   }
 
   if (isLoading) {

@@ -14,12 +14,30 @@ interface MapProps {
 }
 
 export const MushroomLocationMap = ({ center }: MapProps) => {
-  const { isLoaded } = useJsApiLoader({
+  const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
+  
+  const { isLoaded, loadError } = useJsApiLoader({
     id: 'google-map-script',
-    googleMapsApiKey: "" 
+    googleMapsApiKey: apiKey 
   });
 
+  if (loadError) {
+    return (
+      <div style={{ padding: '20px', textAlign: 'center', color: '#666' }}>
+        Nie udało się załadować mapy. Sprawdź konfigurację klucza API Google Maps.
+      </div>
+    );
+  }
+
   if (!isLoaded) return <div>Ładowanie mapy...</div>;
+  
+  if (!apiKey) {
+    return (
+      <div style={{ padding: '20px', textAlign: 'center', color: '#666' }}>
+        Mapa wymaga klucza API Google Maps. Dodaj VITE_GOOGLE_MAPS_API_KEY do pliku .env
+      </div>
+    );
+  }
 
   return (
     <GoogleMap

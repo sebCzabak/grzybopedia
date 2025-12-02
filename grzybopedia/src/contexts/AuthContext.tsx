@@ -1,6 +1,7 @@
 import { createContext, useState, useEffect, useContext, type ReactNode, useCallback } from 'react';
 import axiosInstance from '../api/axiosInstance'; 
 import { type UserProfile } from '../types';
+import { Box, CircularProgress, Typography } from '@mui/material';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -60,8 +61,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AuthContext.Provider value={{ isAuthenticated: !!user, user, login, logout, isLoading, token, refetchUser }}>
-
-      {isLoading ? <div>Ładowanie...</div> : children}
+      {isLoading ? (
+        <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+          <CircularProgress size={60} />
+          <Typography variant="body1" color="text.secondary" sx={{ mt: 2 }}>
+            Ładowanie...
+          </Typography>
+        </Box>
+      ) : (
+        children
+      )}
     </AuthContext.Provider>
   );
 };
