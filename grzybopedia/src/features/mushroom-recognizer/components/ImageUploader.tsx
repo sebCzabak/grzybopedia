@@ -8,7 +8,10 @@ import {
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import ReplayIcon from '@mui/icons-material/Replay';
+import CelebrationIcon from '@mui/icons-material/Celebration';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import Webcam from 'react-webcam';
+import confetti from 'canvas-confetti';
 import { type Mushroom } from '../../../types/index'
 import axiosInstance from '../../../api/axiosInstance';
 import { toast } from 'react-toastify';
@@ -43,6 +46,7 @@ export const ImageUploader = () => {
   const [isWebcamOpen, setIsWebcamOpen] = useState(false);
   const webcamRef = useRef<Webcam>(null);
   const [isFindingSaved,setIsFindingSaved]=useState(false);
+  const [showCelebrationModal, setShowCelebrationModal] = useState(false);
   const { refetchUser, isAuthenticated } = useAuth();
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -185,6 +189,42 @@ export const ImageUploader = () => {
     setError(null);
     setUploadProgress(0);
     setIsFindingSaved(false);
+    setShowCelebrationModal(false);
+  };
+
+  // Funkcja do wywołania konfetti
+  const triggerConfetti = () => {
+    const duration = 3000;
+    const animationEnd = Date.now() + duration;
+    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+    function randomInRange(min: number, max: number) {
+      return Math.random() * (max - min) + min;
+    }
+
+    const interval: NodeJS.Timeout = setInterval(function() {
+      const timeLeft = animationEnd - Date.now();
+
+      if (timeLeft <= 0) {
+        return clearInterval(interval);
+      }
+
+      const particleCount = 50 * (timeLeft / duration);
+      
+      // Konfetti z lewej strony
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }
+      });
+      
+      // Konfetti z prawej strony
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
+      });
+    }, 250);
   };
 
   // Funkcja do sprawdzania czy ID jest prawidłowe (int lub GUID, nie placeholder)
@@ -276,9 +316,12 @@ export const ImageUploader = () => {
       const response = await axiosInstance.post('/findings', requestData);
       console.log('Odpowiedź z serwera:', response.data);
 
-      toast.success('Znalezisko zapisane! Dodano punkty.');
       setIsFindingSaved(true);
       refetchUser();
+      
+      // Wywołaj konfetti i pokaż modal z gratulacją
+      triggerConfetti();
+      setShowCelebrationModal(true);
       
     }
     catch(err:any){
@@ -443,6 +486,57 @@ export const ImageUploader = () => {
         )}
       </Paper>
       
+      {/* Modal z gratulacją */}
+      <Dialog 
+        open={showCelebrationModal} 
+        onClose={() => setShowCelebrationModal(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 4,
+            textAlign: 'center',
+            p: 2
+          }
+        }}
+      >
+        <DialogContent sx={{ py: 4 }}>
+          <CelebrationIcon sx={{ fontSize: 80, color: 'primary.main', mb: 2 }} />
+          <Typography variant="h4" component="h2" fontWeight="bold" gutterBottom color="primary">
+            Gratulacje! 🎉
+          </Typography>
+          <Typography variant="h6" color="text.secondary" gutterBottom>
+            Znalezisko zapisane!
+          </Typography>
+          <Typography variant="body1" color="text.secondary" sx={{ mt: 2 }}>
+            Twój grzyb został dodany do kolekcji. Zdobyłeś punkty!
+          </Typography>
+          {result && (
+            <Box sx={{ mt: 3, p: 2, bgcolor: 'action.hover', borderRadius: 2 }}>
+              <CheckCircleIcon sx={{ color: 'success.main', fontSize: 40, mb: 1 }} />
+              <Typography variant="h6" fontWeight="bold">
+                {result.name}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" fontStyle="italic">
+                {result.latinName}
+              </Typography>
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: 'center', pb: 3 }}>
+          <Button 
+            variant="contained" 
+            color="primary" 
+            size="large"
+            onClick={() => setShowCelebrationModal(false)}
+            startIcon={<CheckCircleIcon />}
+          >
+            Świetnie!
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Dialog kamery */}
       <Dialog open={isWebcamOpen} onClose={() => setIsWebcamOpen(false)} maxWidth="md" fullWidth>
         <DialogTitle>Zrób zdjęcie</DialogTitle>
         <DialogContent sx={{ p: 1 }}>
