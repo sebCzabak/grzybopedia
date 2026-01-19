@@ -1,7 +1,6 @@
 import { useState, type FormEvent } from 'react';
-import { useNavigate, useLocation, Link as RouterLink } from 'react-router-dom';
-import { Box, Button, Container, Paper, TextField, Typography, Divider, Alert, Link, Grid, CircularProgress } from "@mui/material";
-import GoogleIcon from '@mui/icons-material/Google';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Box, Button, Container, Paper, TextField, Typography, Divider, Alert, Link, CircularProgress } from "@mui/material";
 import axiosInstance from '../api/axiosInstance'; 
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'react-toastify';

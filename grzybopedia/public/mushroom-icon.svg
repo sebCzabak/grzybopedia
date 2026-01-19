@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Tło -->
+  <rect width="512" height="512" fill="#4CAF50" rx="80"/>
+  
+  <!-- Kapelusz grzyba -->
+  <ellipse cx="256" cy="220" rx="150" ry="100" fill="#D32F2F"/>
+  
+  <!-- Kropki na kapeluszu -->
+  <circle cx="200" cy="200" r="15" fill="#FFFFFF" opacity="0.9"/>
+  <circle cx="280" cy="190" r="18" fill="#FFFFFF" opacity="0.9"/>
+  <circle cx="240" cy="230" r="12" fill="#FFFFFF" opacity="0.9"/>
+  <circle cx="320" cy="220" r="14" fill="#FFFFFF" opacity="0.9"/>
+  <circle cx="190" cy="240" r="10" fill="#FFFFFF" opacity="0.9"/>
+  
+  <!-- Trzon grzyba -->
+  <rect x="226" y="220" width="60" height="140" fill="#F5F5F5" rx="10"/>
+  
+  <!-- Cień trzonu -->
+  <rect x="266" y="220" width="20" height="140" fill="#E0E0E0" rx="10"/>
+  
+  <!-- Podstawa -->
+  <ellipse cx="256" cy="360" rx="40" ry="15" fill="#E0E0E0"/>
+  
+  <!-- Blask na kapeluszu -->
+  <ellipse cx="220" cy="180" rx="40" ry="25" fill="#FFFFFF" opacity="0.2"/>
+</svg>

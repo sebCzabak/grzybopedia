@@ -10,7 +10,7 @@ interface AuthContextType {
   logout: () => void;
   isLoading: boolean; 
   token: string | null; 
-  refetchUser: () => Promise<void>; 
+  refetchUser: (silent?: boolean) => Promise<void>; 
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -21,24 +21,39 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true); 
 
 
-  const refetchUser = useCallback(async () => {
+  const refetchUser = useCallback(async (silent: boolean = false) => {
     if (!token) { 
       setIsLoading(false);
       setUser(null); 
       return;
     }
-    setIsLoading(true);
+    
+    // Jeśli nie jest silent, pokaż loader (tylko przy pierwszym ładowaniu)
+    if (!silent) {
+      setIsLoading(true);
+    }
+    
     try {
       const response = await axiosInstance.get('/users/me');
+      console.log('Dane użytkownika z /users/me:', response.data);
+      console.log('Znalezionych grzybów:', response.data?.mushroomsFound);
+      console.log('Odznaki:', response.data?.badges?.length || 0);
       setUser(response.data);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Błąd podczas pobierania profilu użytkownika:", error);
+      console.error("Status:", error.response?.status);
+      console.error("Response data:", error.response?.data);
 
-      localStorage.removeItem('token');
-      setToken(null);
-      setUser(null);
+      // Jeśli błąd 401, wyloguj użytkownika
+      if (error.response?.status === 401) {
+        localStorage.removeItem('token');
+        setToken(null);
+        setUser(null);
+      }
     } finally {
-      setIsLoading(false);
+      if (!silent) {
+        setIsLoading(false);
+      }
     }
   }, [token]); 
 

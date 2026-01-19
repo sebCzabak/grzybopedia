@@ -1,9 +1,16 @@
-import { Avatar, Box, Divider, Grid, Icon, List, ListItem, ListItemAvatar, ListItemText, Paper, Typography, CircularProgress, Alert } from "@mui/material";
+import { Avatar, Box, Divider, Grid, Icon, List, ListItem, ListItemAvatar, ListItemText, Paper, Typography, CircularProgress, Alert, Button } from "@mui/material";
 import { useAuth } from "../contexts/AuthContext"; 
+import RefreshIcon from '@mui/icons-material/Refresh';
+import { useEffect } from 'react';
 
 export const ProfilePage = () => {
 
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, refetchUser } = useAuth();
+
+  // Odśwież dane przy wejściu na stronę profilu
+  useEffect(() => {
+    refetchUser(true); // Odśwież w tle bez loadera
+  }, [refetchUser]);
 
 
   if (isLoading) {
@@ -16,9 +23,19 @@ export const ProfilePage = () => {
 
   return (
     <Box>
-      <Typography variant="h3" component="h1" sx={{ mb: 4, fontWeight: 'bold' }}>
-        Mój Profil
-      </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+        <Typography variant="h3" component="h1" sx={{ fontWeight: 'bold' }}>
+          Mój Profil
+        </Typography>
+        <Button 
+          variant="outlined" 
+          startIcon={<RefreshIcon />}
+          onClick={() => refetchUser(true)}
+          disabled={isLoading}
+        >
+          Odśwież
+        </Button>
+      </Box>
 
       <Grid container spacing={4}>
 

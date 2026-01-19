@@ -13,6 +13,7 @@ import { ProtectedRoute } from './components/common/ProtectedRoute';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import InstallPWA from './components/InstallPWA';
 
 function App() {
   return (
@@ -48,6 +49,7 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
           </Routes>
         </Container>
+        <InstallPWA />
       </BrowserRouter>
       </AuthProvider>
     </ThemeProvider>

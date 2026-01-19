@@ -1,6 +1,6 @@
 import  { useState, type ChangeEvent, useRef, useCallback } from 'react';
 import {
-  Box, Button, Paper, Typography, Alert, Card, CardMedia, CardContent,
+  Box, Button, Paper, Typography, Alert,
   LinearProgress, Dialog, DialogTitle, DialogContent, DialogActions, Container,
   Grid, Chip,
   keyframes
@@ -317,7 +317,9 @@ export const ImageUploader = () => {
       console.log('Odpowiedź z serwera:', response.data);
 
       setIsFindingSaved(true);
-      refetchUser();
+      
+      // Odśwież dane użytkownika w tle (bez pokazywania loadera)
+      await refetchUser(true);
       
       // Wywołaj konfetti i pokaż modal z gratulacją
       triggerConfetti();
